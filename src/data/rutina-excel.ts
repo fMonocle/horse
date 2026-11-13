@@ -1,5 +1,5 @@
 export type RutinaSet = { percent: number; reps: number; kg: number };
-export type LucasSession = {
+export type RutinaSession = {
   code: string;
   day: string | null;
   sets: RutinaSet[];
@@ -8,13 +8,13 @@ export type LucasSession = {
   reps: number;
   avgKg: number;
 };
-export type LucasExercise = {
+export type RutinaExercise = {
   name: string;
   referenceKg: number;
-  sessions: LucasSession[];
+  sessions: RutinaSession[];
 };
 
-export const rutinaExercises: LucasExercise[] = [
+export const rutinaExercises: RutinaExercise[] = [
   {
     "name": "SUBIDA A 2-4 CAJ EXP",
     "referenceKg": 210,
