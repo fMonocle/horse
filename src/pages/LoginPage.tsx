@@ -37,7 +37,7 @@ export function LoginPage() {
   return (
     <main className="login-screen">
       <section className="login-card">
-        <img src="/horse-logo.png" alt="HORSE" />
+        <img src={`${import.meta.env.BASE_URL}horse-logo.png`} alt="HORSE" />
         <h1>Alto rendimiento</h1>
         <p>Entrá para ver el panel del entrenador y el del deportista.</p>
         <button

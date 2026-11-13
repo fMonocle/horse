@@ -8,6 +8,7 @@ import { AthletesPage } from "./pages/AthletesPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { PlanningPage } from "./pages/PlanningPage";
+import { RoutinePage } from "./pages/RoutinePage";
 import { TrackingPage } from "./pages/TrackingPage";
 import { RequireAuth } from "./RequireAuth";
 import { TrainingProvider } from "./store";
@@ -27,6 +28,7 @@ export function App() {
                   <Route path="deportistas" element={<AthletesPage />} />
                   <Route path="deportistas/:id" element={<AthleteProfilePage />} />
                   <Route path="planificacion" element={<PlanningPage />} />
+                  <Route path="rutina" element={<RoutinePage />} />
                   <Route path="seguimiento" element={<TrackingPage />} />
                   <Route path="mi-semana" element={<AthleteWeekPage />} />
                   <Route path="mi-evolucion" element={<AthleteProgressPage />} />

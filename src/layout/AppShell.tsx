@@ -1,6 +1,7 @@
 import {
   CalendarOutlined,
   DashboardOutlined,
+  FileTextOutlined,
   LineChartOutlined,
   LogoutOutlined,
   TeamOutlined,
@@ -16,6 +17,7 @@ const { Sider, Header, Content } = Layout;
 const coachItems = [
   { key: "/app", icon: <DashboardOutlined />, label: "Panel" },
   { key: "/app/deportistas", icon: <TeamOutlined />, label: "Deportistas" },
+  { key: "/app/rutina", icon: <FileTextOutlined />, label: "Rutina" },
   { key: "/app/planificacion", icon: <CalendarOutlined />, label: "Planificación" },
   { key: "/app/seguimiento", icon: <LineChartOutlined />, label: "Seguimiento" },
 ];
@@ -39,7 +41,7 @@ export function AppShell() {
     <Layout style={{ minHeight: "100vh" }}>
       <Sider width={248} style={{ background: "#DDE0E6", borderRight: "1px solid #CDD1D8" }}>
         <div className="brand">
-          <img src="/horse-logo.png" alt="HORSE" />
+          <img src={`${import.meta.env.BASE_URL}horse-logo.png`} alt="HORSE" />
         </div>
         <Menu
           mode="inline"

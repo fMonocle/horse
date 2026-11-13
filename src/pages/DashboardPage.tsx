@@ -98,6 +98,9 @@ export function DashboardPage() {
             <Button block icon={<ArrowRightOutlined />} onClick={() => navigate("/app/deportistas")}>
               Ver deportistas
             </Button>
+            <Button block onClick={() => navigate("/app/rutina")}>
+              Abrir la rutina
+            </Button>
             <Button block onClick={() => navigate("/app/planificacion")}>
               Abrir planificación
             </Button>

@@ -325,6 +325,206 @@ a {
   gap: 10px;
 }
 
+.athlete-sheet {
+  background: #fff;
+  border: 1px solid #e6e8ee;
+  border-radius: 16px;
+  padding: 28px 32px 22px;
+  max-width: 760px;
+}
+
+.athlete-sheet header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 18px;
+}
+
+.athlete-sheet header strong {
+  font-size: 22px;
+  letter-spacing: -0.04em;
+}
+
+.athlete-sheet header span,
+.sheet-who span,
+.athlete-sheet footer,
+.plan-lift-head span,
+.plan-line,
+.plan-summary {
+  color: #5c6570;
+}
+
+.sheet-who {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e6e8ee;
+}
+
+.sheet-who b,
+.sheet-who span {
+  display: block;
+}
+
+.athlete-sheet section {
+  padding: 14px 0 4px;
+  border-bottom: 1px solid #e6e8ee;
+}
+
+.athlete-sheet h2,
+.day-plan h2 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.athlete-sheet ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.athlete-sheet li {
+  margin: 8px 0;
+}
+
+.sheet-lift b {
+  display: block;
+}
+
+.sheet-lift em,
+.plan-lift-head em {
+  font-style: normal;
+  color: #5c6570;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.set-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.set-row span {
+  background: #f3f6ff;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.athlete-sheet footer {
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+.plan-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.plan-summary {
+  margin: 0;
+}
+
+.day-plan {
+  background: #fff;
+  border: 1px solid #e6e8ee;
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+
+.plan-line {
+  margin: 6px 0;
+}
+
+.plan-lift {
+  border-top: 1px solid #e6e8ee;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.plan-lift-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.plan-lift-head b,
+.plan-lift-head span {
+  display: block;
+}
+
+.set-table {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.set-table div {
+  background: #f5f6f8;
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.set-table span,
+.set-table strong {
+  display: block;
+}
+
+.set-table strong {
+  font-size: 18px;
+  letter-spacing: -0.03em;
+}
+
+.plan-note {
+  margin: 10px 0 0;
+  background: #fbf6ef;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.excel-table {
+  display: grid;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.excel-row {
+  display: grid;
+  min-width: 860px;
+  grid-template-columns: 72px 110px minmax(220px, 1.6fr) 72px 110px 64px 110px;
+  gap: 10px;
+  align-items: start;
+  padding: 8px 0;
+  border-top: 1px solid #e6e8ee;
+}
+
+.excel-head {
+  border-top: none;
+  color: #5c6570;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.excel-sets {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.excel-sets em {
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
 .demo-banner {
   margin: 0 0 16px;
   background: #eaf0ff;
