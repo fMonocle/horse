@@ -9,7 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import { addDays, formatShort, startOfWeek, toIso } from "../dates";
-import { athleteName, athletes, DEMO_ATHLETE_ID } from "../data/athletes";
+import { athletes, DEMO_ATHLETE_ID } from "../data/athletes";
 import { measurements } from "../data/seed";
 import { useTraining } from "../store";
 
@@ -30,9 +30,6 @@ export function AthleteWeekPage() {
 
   return (
     <div className="page">
-      <div className="demo-banner">
-        Así vería su semana {athleteName(athlete)}. En la reunión se cambia desde el encabezado.
-      </div>
       <div className="page-title">
         <div>
           <h1>Hola, {athlete.firstName}</h1>

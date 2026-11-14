@@ -56,9 +56,6 @@ export function DashboardPage() {
 
   return (
     <div className="page">
-      <div className="demo-banner">
-        Demostración comercial. Los deportistas y las mediciones son ficticios.
-      </div>
       <div className="page-title">
         <div>
           <h1>Panel de entrenador</h1>

@@ -24,7 +24,7 @@ export function RoutinePage() {
       <div className="page-title">
         <div>
           <h1>Rutina de Lucas</h1>
-          <p>Seis ejercicios con kilos calculados. El resto del archivo no tiene referencia y la cuenta da cero.</p>
+          <p>Ejercicios con referencia de carga y kilos calculados por sesión.</p>
         </div>
         <Select
           className="routine-select"
@@ -66,7 +66,7 @@ export function RoutinePage() {
         </div>
       </section>
       <p className="plan-summary">
-        En el Excel también hay sentadilla, peso muerto, tirones y otras filas de cargadas y arranque. Esas filas no tienen la referencia cargada, así que el kilo calculado es cero y no las muestro como carga.
+        Sentadilla, peso muerto, tirones y arranque no tienen referencia de carga, así que no se muestran.
       </p>
     </div>
   );

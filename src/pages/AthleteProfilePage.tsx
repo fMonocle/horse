@@ -23,7 +23,7 @@ export function AthleteProfilePage() {
   if (!athlete) {
     return (
       <div className="page">
-        <p>Ese deportista no está en la demostración.</p>
+        <p>No encontramos ese deportista.</p>
         <Link to="/app/deportistas">Volver al listado</Link>
       </div>
     );

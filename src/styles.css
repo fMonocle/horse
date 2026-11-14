@@ -93,11 +93,6 @@ a {
   opacity: 0.7;
 }
 
-.login-note {
-  margin-top: 18px !important;
-  font-size: 12px;
-}
-
 .brand {
   padding: 16px 16px 8px;
 }
@@ -589,16 +584,6 @@ a {
 .excel-sets em {
   font-style: normal;
   font-variant-numeric: tabular-nums;
-}
-
-.demo-banner {
-  margin: 0 0 16px;
-  background: #eaf0ff;
-  color: #1d3f99;
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 600;
 }
 
 @media (max-width: 1100px) {

@@ -52,7 +52,7 @@ export function PlanningPage() {
       <div className="page-title">
         <div>
           <h1>Planificación</h1>
-          <p>Las sesiones nuevas quedan en esta demostración, en la memoria del navegador.</p>
+          <p>Sesiones de entrenamiento por deportista y por día.</p>
         </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => openCreate()}>
           Nueva sesión

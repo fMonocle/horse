@@ -55,9 +55,6 @@ export function LoginPage() {
           <GoogleMark />
           {loading ? "Entrando…" : "Continuar con Google"}
         </button>
-        <p className="login-note">
-          Demostración. Este botón no abre una cuenta real de Gmail.
-        </p>
       </section>
     </main>
   );
