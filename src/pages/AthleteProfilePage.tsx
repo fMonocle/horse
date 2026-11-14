@@ -78,7 +78,7 @@ export function AthleteProfilePage() {
         </Card>
       </div>
       <Card title={`${athlete.metric} (${athlete.unit})`} style={{ marginTop: 14 }}>
-        <div style={{ height: 260 }}>
+        <div className="chart-box" style={{ height: 260 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chart}>
               <CartesianGrid stroke="#E6E8EE" vertical={false} />
@@ -94,6 +94,7 @@ export function AthleteProfilePage() {
         <Table
           rowKey="date"
           pagination={false}
+          scroll={{ x: true }}
           dataSource={[...measurements.filter((item) => item.athleteId === athlete.id)].reverse()}
           columns={[
             { title: "Fecha", dataIndex: "date", render: (value: string) => formatShort(value) },

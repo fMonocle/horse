@@ -1,10 +1,14 @@
 import { Avatar, Button, Input, Select, Table, Tag } from "antd";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type TdHTMLAttributes } from "react";
 import { useNavigate } from "react-router-dom";
 import { addDays, formatShort, startOfWeek, toIso } from "../dates";
 import { athleteName, athletes, statusLabel } from "../data/athletes";
 import { useTraining } from "../store";
 import type { AthleteStatus } from "../types";
+
+function cellLabel(label: string): TdHTMLAttributes<HTMLTableCellElement> {
+  return { "data-label": label } as TdHTMLAttributes<HTMLTableCellElement>;
+}
 
 const statusColor: Record<AthleteStatus, string> = {
   available: "blue",
@@ -45,21 +49,21 @@ export function AthletesPage() {
       <div className="filters">
         <Input.Search
           allowClear
+          className="filter-search"
           placeholder="Buscar por nombre o país"
-          style={{ width: 280 }}
           onChange={(event) => setQuery(event.target.value)}
         />
         <Select
           allowClear
+          className="filter-select"
           placeholder="Disciplina"
-          style={{ width: 180 }}
           options={sports.map((item) => ({ value: item, label: item }))}
           onChange={setSport}
         />
         <Select
           allowClear
+          className="filter-select"
           placeholder="Estado"
-          style={{ width: 180 }}
           options={(Object.keys(statusLabel) as AthleteStatus[]).map((item) => ({
             value: item,
             label: statusLabel[item],
@@ -68,12 +72,15 @@ export function AthletesPage() {
         />
       </div>
       <Table
+        className="stack-table"
         rowKey="id"
         dataSource={filtered}
         pagination={false}
+        scroll={{ x: true }}
         columns={[
           {
             title: "Deportista",
+            onCell: () => cellLabel("Deportista"),
             render: (_, athlete) => (
               <div className="athlete-cell">
                 <Avatar style={{ background: "#12151C" }}>
@@ -87,14 +94,16 @@ export function AthletesPage() {
               </div>
             ),
           },
-          { title: "Disciplina", dataIndex: "sport" },
+          { title: "Disciplina", dataIndex: "sport", onCell: () => cellLabel("Disciplina") },
           {
             title: "Estado",
             dataIndex: "status",
+            onCell: () => cellLabel("Estado"),
             render: (value: AthleteStatus) => <Tag color={statusColor[value]}>{statusLabel[value]}</Tag>,
           },
           {
             title: "Próximo entrenamiento",
+            onCell: () => cellLabel("Próximo entrenamiento"),
             render: (_, athlete) => {
               const next = sessions
                 .filter((session) => session.athleteId === athlete.id && session.date >= start && session.date <= end && !session.completed)

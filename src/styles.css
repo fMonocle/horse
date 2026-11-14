@@ -111,6 +111,19 @@ a {
   padding: 4px 8px 2px;
 }
 
+.app-frame {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.ant-layout-has-sider > .ant-layout,
+.ant-layout-content,
+.page,
+.ant-card,
+.ant-card-body {
+  min-width: 0;
+}
+
 .shell-header {
   background: #fff;
   border-bottom: 1px solid #e6e8ee;
@@ -118,10 +131,63 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  height: 64px;
   padding: 0 24px;
+  line-height: 1.2;
   position: sticky;
   top: 0;
   z-index: 5;
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.header-who {
+  color: #5c6570;
+  font-size: 13px;
+}
+
+.drawer-logo {
+  width: 120px;
+  height: auto;
+  display: block;
+  background: #fff;
+  border-radius: 10px;
+  padding: 2px 6px;
+}
+
+.filter-search {
+  width: 280px;
+  max-width: 100%;
+}
+
+.filter-select {
+  width: 180px;
+  max-width: 100%;
+}
+
+.filter-select-wide {
+  width: 260px;
+  max-width: 100%;
+}
+
+.routine-select {
+  min-width: 280px;
+  max-width: 100%;
+}
+
+.chart-box {
+  width: 100%;
+  min-width: 0;
+}
+
+.chart-box .recharts-responsive-container,
+.chart-box .recharts-wrapper {
+  max-width: 100%;
 }
 
 .header-actions {
@@ -546,21 +612,230 @@ a {
   }
 }
 
+@media (max-width: 991px) {
+  .header-main {
+    flex: 1;
+  }
+}
+
 @media (max-width: 720px) {
   .page {
     padding: 16px;
   }
 
-  .stat-grid,
+  .page-title h1 {
+    font-size: 24px;
+  }
+
+  .login-card {
+    padding: 28px 20px 22px;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stat-card {
+    padding: 14px;
+  }
+
+  .stat-card strong {
+    font-size: 28px;
+  }
+
   .two-col,
   .week-grid {
     grid-template-columns: 1fr;
   }
 
-  .shell-header,
+  .day-column {
+    min-height: 0;
+  }
+
+  .ant-layout-header.shell-header {
+    height: auto !important;
+    padding: 10px 12px !important;
+    line-height: 1.2 !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-toggle {
+    order: 1;
+  }
+
+  .header-actions {
+    order: 2;
+    margin-left: auto;
+    gap: 8px;
+  }
+
+  .header-main {
+    order: 3;
+    flex: 1 1 100%;
+  }
+
+  .panel-switch {
+    width: 100%;
+  }
+
+  .header-who,
+  .logout-label {
+    display: none;
+  }
+
   .page-title,
   .week-toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .page-title > .ant-tag {
+    align-self: flex-start;
+  }
+
+  .week-toolbar b {
+    text-align: center;
+  }
+
+  .filters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .filter-search,
+  .filter-select,
+  .filter-select-wide,
+  .routine-select,
+  .page-title > .ant-btn,
+  .page-title > .ant-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .sheet-who,
+  .athlete-sheet header,
+  .plan-lift-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .athlete-sheet {
+    padding: 18px 16px;
+  }
+
+  .excel-table {
+    overflow: visible;
+  }
+
+  .excel-head {
+    display: none;
+  }
+
+  .excel-row {
+    min-width: 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    padding: 12px;
+    border: 1px solid #e6e8ee;
+    border-radius: 12px;
+    background: #f7f8fb;
+  }
+
+  .excel-row > *::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    color: #5c6570;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .excel-sets {
+    grid-column: 1 / -1;
+  }
+
+  .ant-modal {
+    max-width: calc(100vw - 16px);
+    margin: 8px auto;
+  }
+
+  .ant-modal-footer {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .ant-modal-footer .ant-btn {
+    width: 100%;
+    margin-inline-start: 0 !important;
+  }
+
+  .stack-table .ant-table-content,
+  .stack-table .ant-table-body {
+    overflow: visible !important;
+  }
+
+  .stack-table table {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .stack-table colgroup,
+  .stack-table thead,
+  .stack-table .ant-table-measure-row {
+    display: none;
+  }
+
+  .stack-table tbody,
+  .stack-table tr,
+  .stack-table td {
+    display: block;
+    width: auto !important;
+  }
+
+  .stack-table tr.ant-table-row {
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    border: 1px solid #e6e8ee;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .stack-table td.ant-table-cell {
+    border-bottom: none !important;
+    padding: 4px 0 !important;
+  }
+
+  .stack-table td.ant-table-cell[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 2px;
+    color: #5c6570;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .stack-table td.ant-table-cell .ant-btn {
+    width: 100%;
+  }
+
+  .ant-descriptions-item-container {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .ant-descriptions-item-label {
+    padding-bottom: 2px;
+  }
+
+  .ant-descriptions-item-content {
+    width: 100%;
   }
 }
