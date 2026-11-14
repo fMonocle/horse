@@ -27,8 +27,8 @@ export function RoutinePage() {
           <p>Seis ejercicios con kilos calculados. El resto del archivo no tiene referencia y la cuenta da cero.</p>
         </div>
         <Select
+          className="routine-select"
           value={exercise.name}
-          style={{ minWidth: 280 }}
           options={rutinaExercises.map((item) => ({
             value: item.name,
             label: `${item.name} · ${item.sessions.length}`,
@@ -50,17 +50,17 @@ export function RoutinePage() {
           </div>
           {exercise.sessions.map((session) => (
             <div className="excel-row" key={session.code}>
-              <b>{session.code}</b>
-              <span>{session.day ?? "Sin día"}</span>
-              <span className="excel-sets">
+              <b data-label="Código">{session.code}</b>
+              <span data-label="Día">{session.day ?? "Sin día"}</span>
+              <span className="excel-sets" data-label="Series">
                 {session.sets.map((set, index) => (
                   <em key={index}>{formatSet(set)}</em>
                 ))}
               </span>
-              <span>{numberFormat.format(session.imr)}</span>
-              <span>{formatKg(session.tonnage)}</span>
-              <span>{session.reps}</span>
-              <span>{formatKg(session.avgKg)}</span>
+              <span data-label="IMR">{numberFormat.format(session.imr)}</span>
+              <span data-label="Tonelaje">{formatKg(session.tonnage)}</span>
+              <span data-label="Reps">{session.reps}</span>
+              <span data-label="Peso medio">{formatKg(session.avgKg)}</span>
             </div>
           ))}
         </div>

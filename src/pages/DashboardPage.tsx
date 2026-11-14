@@ -1,6 +1,6 @@
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { Button, Card, Table, Tag } from "antd";
-import { useMemo } from "react";
+import { useMemo, type TdHTMLAttributes } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Bar,
@@ -14,6 +14,10 @@ import {
 import { addDays, formatShort, startOfWeek, toIso, weekdayShort } from "../dates";
 import { athleteName, athletes } from "../data/athletes";
 import { useTraining } from "../store";
+
+function cellLabel(label: string): TdHTMLAttributes<HTMLTableCellElement> {
+  return { "data-label": label } as TdHTMLAttributes<HTMLTableCellElement>;
+}
 
 export function DashboardPage() {
   const { sessions } = useTraining();
@@ -81,7 +85,7 @@ export function DashboardPage() {
       </div>
       <div className="two-col">
         <Card title="Cumplimiento de la semana">
-          <div style={{ height: 260 }}>
+          <div className="chart-box" style={{ height: 260 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chart}>
                 <CartesianGrid stroke="#E6E8EE" vertical={false} />
@@ -115,20 +119,23 @@ export function DashboardPage() {
       </div>
       <Card title="Últimos movimientos" style={{ marginTop: 14 }}>
         <Table
+          className="stack-table"
           rowKey="id"
           pagination={false}
+          scroll={{ x: true }}
           dataSource={latest}
           onRow={(row) => ({
             onClick: () => navigate(`/app/deportistas/${row.athleteId}`),
             style: { cursor: "pointer" },
           })}
           columns={[
-            { title: "Deportista", dataIndex: "athlete" },
-            { title: "Sesión", dataIndex: "type" },
-            { title: "Fecha", dataIndex: "date", render: (value: string) => formatShort(value) },
+            { title: "Deportista", dataIndex: "athlete", onCell: () => cellLabel("Deportista") },
+            { title: "Sesión", dataIndex: "type", onCell: () => cellLabel("Sesión") },
+            { title: "Fecha", dataIndex: "date", onCell: () => cellLabel("Fecha"), render: (value: string) => formatShort(value) },
             {
               title: "Estado",
               dataIndex: "completed",
+              onCell: () => cellLabel("Estado"),
               render: (done: boolean) => (
                 <Tag color={done ? "blue" : "default"}>{done ? "Hecho" : "Pendiente"}</Tag>
               ),

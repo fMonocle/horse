@@ -1,5 +1,5 @@
 import { Card, Select, Table } from "antd";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type TdHTMLAttributes } from "react";
 import {
   CartesianGrid,
   Line,
@@ -13,6 +13,10 @@ import { addDays, formatShort, startOfWeek, toIso } from "../dates";
 import { athleteName, athletes } from "../data/athletes";
 import { measurements } from "../data/seed";
 import { useTraining } from "../store";
+
+function cellLabel(label: string): TdHTMLAttributes<HTMLTableCellElement> {
+  return { "data-label": label } as TdHTMLAttributes<HTMLTableCellElement>;
+}
 
 export function TrackingPage() {
   const { sessions } = useTraining();
@@ -45,14 +49,14 @@ export function TrackingPage() {
       </div>
       <div className="filters">
         <Select
+          className="filter-select-wide"
           value={athleteId}
-          style={{ width: 260 }}
           options={athletes.map((item) => ({ value: item.id, label: athleteName(item) }))}
           onChange={setAthleteId}
         />
         <Select
+          className="filter-select"
           value={weeks}
-          style={{ width: 180 }}
           options={[
             { value: 4, label: "Últimas 4 semanas" },
             { value: 8, label: "Últimas 8 semanas" },
@@ -79,7 +83,7 @@ export function TrackingPage() {
         </article>
       </div>
       <Card title={`${athlete.metric} · ${athlete.unit}`}>
-        <div style={{ height: 280 }}>
+        <div className="chart-box" style={{ height: 280 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chart}>
               <CartesianGrid stroke="#E6E8EE" vertical={false} />
@@ -94,14 +98,16 @@ export function TrackingPage() {
       <div className="two-col" style={{ marginTop: 14 }}>
         <Card title="Registro de entrenamientos">
           <Table
+            className="stack-table"
             rowKey="id"
             pagination={{ pageSize: 6, hideOnSinglePage: true }}
+            scroll={{ x: true }}
             dataSource={history}
             columns={[
-              { title: "Fecha", dataIndex: "date", render: (value: string) => formatShort(value) },
-              { title: "Tipo", dataIndex: "type" },
-              { title: "Duración", dataIndex: "durationMin", render: (value: number) => `${value} min` },
-              { title: "Estado", dataIndex: "completed", render: (doneRow: boolean) => (doneRow ? "Hecho" : "Pendiente") },
+              { title: "Fecha", dataIndex: "date", onCell: () => cellLabel("Fecha"), render: (value: string) => formatShort(value) },
+              { title: "Tipo", dataIndex: "type", onCell: () => cellLabel("Tipo") },
+              { title: "Duración", dataIndex: "durationMin", onCell: () => cellLabel("Duración"), render: (value: number) => `${value} min` },
+              { title: "Estado", dataIndex: "completed", onCell: () => cellLabel("Estado"), render: (doneRow: boolean) => (doneRow ? "Hecho" : "Pendiente") },
             ]}
           />
         </Card>
