@@ -43,7 +43,7 @@ export function AthletesPage() {
       <div className="page-title">
         <div>
           <h1>Deportistas</h1>
-          <p>{filtered.length} en esta vista. Los nombres son de la demostración.</p>
+          <p>{filtered.length} en esta vista.</p>
         </div>
       </div>
       <div className="filters">
