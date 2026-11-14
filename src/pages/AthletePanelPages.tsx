@@ -1,4 +1,8 @@
-import { Card, Tag } from "antd";
+import { Alert, Button, Card, Empty, Tag } from "antd";
+import { useNavigate } from "react-router-dom";
+import { useVisibleIncidents } from "../access";
+import { useFollowup } from "../followup-store";
+import { fitnessLabel } from "../data/followup";
 import {
   CartesianGrid,
   Line,
@@ -27,6 +31,17 @@ export function AthleteWeekPage() {
     .filter((session) => session.athleteId === athlete.id && session.date >= start && session.date <= end)
     .sort((a, b) => a.date.localeCompare(b.date));
   const done = week.filter((session) => session.completed).length;
+  const navigate = useNavigate();
+  const { routines } = useFollowup();
+  const incidents = useVisibleIncidents();
+  const requests = incidents.filter((incident) => incident.status === "docs_requested");
+  const restriction = incidents.find(
+    (incident) => incident.status !== "closed" && incident.evaluation && incident.evaluation.fitness !== "fit",
+  );
+  const myRoutines = routines
+    .filter((routine) => routine.athleteId === athlete.id)
+    .sort((a, b) => (a.status === b.status ? a.date.localeCompare(b.date) : a.status === "assigned" ? -1 : 1))
+    .slice(0, 4);
 
   return (
     <div className="page">
@@ -41,6 +56,53 @@ export function AthleteWeekPage() {
           {done} de {week.length} hechas
         </Tag>
       </div>
+      {requests.length > 0 && (
+        <Alert
+          type="warning"
+          showIcon
+          style={{ marginBottom: 14 }}
+          message={`Tu entrenador te pidió documentación médica (${requests[0].title.toLowerCase()}).`}
+          action={
+            <Button size="small" onClick={() => navigate("/app/mi-historial")}>
+              Subir
+            </Button>
+          }
+        />
+      )}
+      {restriction?.evaluation && (
+        <Alert
+          type="info"
+          showIcon
+          style={{ marginBottom: 14 }}
+          message={`Indicación médica: ${fitnessLabel[restriction.evaluation.fitness].toLowerCase()}`}
+          description={restriction.evaluation.recommendation}
+        />
+      )}
+      <Card title="Rutinas para informar" style={{ marginBottom: 14 }}>
+        {myRoutines.length === 0 ? (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No tenés rutinas asignadas." />
+        ) : (
+          <div className="mini-list">
+            {myRoutines.map((routine) => (
+              <div key={routine.id} className="routine-row">
+                <div>
+                  <b>{routine.title}</b>
+                  <span>
+                    {formatShort(routine.date)} · {routine.exercises.length} {routine.exercises.length === 1 ? "ejercicio" : "ejercicios"}
+                  </span>
+                </div>
+                {routine.status === "assigned" ? (
+                  <Button type="primary" onClick={() => navigate(`/app/mi-rutina/${routine.id}`)}>
+                    Informar
+                  </Button>
+                ) : (
+                  <Button onClick={() => navigate(`/app/mi-rutina/${routine.id}`)}>Ver</Button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
       <div className="two-col">
         <Card title="Tu planificación">
           {week.map((session) => (

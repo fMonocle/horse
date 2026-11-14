@@ -10,7 +10,8 @@ import {
   YAxis,
 } from "recharts";
 import { addDays, formatShort, startOfWeek, toIso } from "../dates";
-import { athleteName, athletes } from "../data/athletes";
+import { useMyAthletes } from "../admin-store";
+import { athleteName, athletes as allAthletes } from "../data/athletes";
 import { measurements } from "../data/seed";
 import { useTraining } from "../store";
 
@@ -20,6 +21,8 @@ function cellLabel(label: string): TdHTMLAttributes<HTMLTableCellElement> {
 
 export function TrackingPage() {
   const { sessions } = useTraining();
+  const myAthletes = useMyAthletes();
+  const athletes = myAthletes.length > 0 ? myAthletes : allAthletes;
   const [athleteId, setAthleteId] = useState(athletes[0].id);
   const [weeks, setWeeks] = useState(8);
   const athlete = athletes.find((item) => item.id === athleteId) ?? athletes[0];

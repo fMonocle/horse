@@ -3,6 +3,7 @@ import { Button, DatePicker, Form, Input, InputNumber, Modal, Select } from "ant
 import dayjs, { type Dayjs } from "dayjs";
 import { useState } from "react";
 import { addDays, formatShort, startOfWeek, toIso, weekLabel, weekdayShort } from "../dates";
+import { useMyAthletes } from "../admin-store";
 import { athleteName, athletes } from "../data/athletes";
 import { sessionTypes } from "../data/seed";
 import { useTraining } from "../store";
@@ -17,7 +18,10 @@ type FormValues = {
 };
 
 export function PlanningPage() {
-  const { sessions, addSession, toggleCompleted } = useTraining();
+  const { sessions: allSessions, addSession, toggleCompleted } = useTraining();
+  const myAthletes = useMyAthletes();
+  const mine = new Set(myAthletes.map((athlete) => athlete.id));
+  const sessions = allSessions.filter((session) => mine.has(session.athleteId));
   const [offset, setOffset] = useState(0);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Session | null>(null);
@@ -113,7 +117,7 @@ export function PlanningPage() {
         <Form form={form} layout="vertical" onFinish={save} style={{ marginTop: 12 }}>
           <Form.Item name="athleteId" label="Deportista" rules={[{ required: true, message: "Elegí un deportista" }]}>
             <Select
-              options={athletes.map((athlete) => ({ value: athlete.id, label: athleteName(athlete) }))}
+              options={myAthletes.map((athlete) => ({ value: athlete.id, label: athleteName(athlete) }))}
               placeholder="Elegir"
             />
           </Form.Item>

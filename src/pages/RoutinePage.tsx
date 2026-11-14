@@ -1,5 +1,7 @@
-import { Select } from "antd";
+import { SendOutlined } from "@ant-design/icons";
+import { Button, Select } from "antd";
 import { useMemo, useState } from "react";
+import { AssignRoutineModal } from "../components/AssignRoutineModal";
 import { rutinaExercises, type RutinaSet } from "../data/rutina-excel";
 
 const numberFormat = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1 });
@@ -18,6 +20,19 @@ export function RoutinePage() {
     () => rutinaExercises.find((item) => item.name === name) ?? rutinaExercises[0],
     [name],
   );
+  const [assigning, setAssigning] = useState(false);
+  const firstSession = exercise.sessions[0];
+  const defaults = useMemo(
+    () => [
+      {
+        name: exercise.name,
+        prescription: firstSession
+          ? `${firstSession.sets.length} series: ${firstSession.sets.map((set) => `${formatKg(set.kg)} × ${set.reps}`).join(", ")}`
+          : "",
+      },
+    ],
+    [exercise.name, firstSession],
+  );
 
   return (
     <div className="page">
@@ -26,15 +41,20 @@ export function RoutinePage() {
           <h1>Rutina de Lucas</h1>
           <p>Ejercicios con referencia de carga y kilos calculados por sesión.</p>
         </div>
-        <Select
-          className="routine-select"
-          value={exercise.name}
-          options={rutinaExercises.map((item) => ({
-            value: item.name,
-            label: `${item.name} · ${item.sessions.length}`,
-          }))}
-          onChange={setName}
-        />
+        <div className="title-actions">
+          <Select
+            className="routine-select"
+            value={exercise.name}
+            options={rutinaExercises.map((item) => ({
+              value: item.name,
+              label: `${item.name} · ${item.sessions.length}`,
+            }))}
+            onChange={setName}
+          />
+          <Button type="primary" icon={<SendOutlined />} onClick={() => setAssigning(true)}>
+            Asignar rutina
+          </Button>
+        </div>
       </div>
       <section className="day-plan">
         <h2>Referencia {formatKg(exercise.referenceKg)}</h2>
@@ -68,6 +88,12 @@ export function RoutinePage() {
       <p className="plan-summary">
         Sentadilla, peso muerto, tirones y arranque no tienen referencia de carga, así que no se muestran.
       </p>
+      <AssignRoutineModal
+        open={assigning}
+        onClose={() => setAssigning(false)}
+        defaultTitle={`${exercise.name}${firstSession ? ` · ${firstSession.code}` : ""}`}
+        defaultExercises={defaults}
+      />
     </div>
   );
 }

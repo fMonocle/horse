@@ -39,7 +39,7 @@ export function LoginPage() {
       <section className="login-card">
         <img src={`${import.meta.env.BASE_URL}horse-logo.png`} alt="HORSE" />
         <h1>Alto rendimiento</h1>
-        <p>Entrá para ver el panel del entrenador y el del deportista.</p>
+        <p>Planificación, seguimiento, salud y administración del equipo en un solo lugar.</p>
         <button
           className="google-button"
           type="button"

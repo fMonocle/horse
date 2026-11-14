@@ -1,5 +1,5 @@
 import { ArrowRightOutlined } from "@ant-design/icons";
-import { Button, Card, Table, Tag } from "antd";
+import { Alert, Button, Card, Table, Tag } from "antd";
 import { useMemo, type TdHTMLAttributes } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,6 +12,8 @@ import {
   YAxis,
 } from "recharts";
 import { addDays, formatShort, startOfWeek, toIso, weekdayShort } from "../dates";
+import { useVisibleIncidents } from "../access";
+import { useMyAthletes } from "../admin-store";
 import { athleteName, athletes } from "../data/athletes";
 import { useTraining } from "../store";
 
@@ -20,7 +22,13 @@ function cellLabel(label: string): TdHTMLAttributes<HTMLTableCellElement> {
 }
 
 export function DashboardPage() {
-  const { sessions } = useTraining();
+  const { sessions: allSessions } = useTraining();
+  const myAthletes = useMyAthletes();
+  const sessions = useMemo(() => {
+    const ids = new Set(myAthletes.map((athlete) => athlete.id));
+    return allSessions.filter((session) => ids.has(session.athleteId));
+  }, [allSessions, myAthletes]);
+  const unseen = useVisibleIncidents().filter((incident) => !incident.coachSeen);
   const navigate = useNavigate();
   const monday = startOfWeek(new Date());
   const start = toIso(monday);
@@ -62,10 +70,27 @@ export function DashboardPage() {
           <p>Semana del {formatShort(start)} al {formatShort(end)}.</p>
         </div>
       </div>
+      {unseen.length > 0 && (
+        <Alert
+          type="error"
+          showIcon
+          style={{ marginBottom: 14 }}
+          message={
+            unseen.length === 1
+              ? `Nueva incidencia: ${unseen[0].title.toLowerCase()} (${athleteName(athletes.find((item) => item.id === unseen[0].athleteId)!)}).`
+              : `${unseen.length} incidencias nuevas de tus deportistas.`
+          }
+          action={
+            <Button size="small" onClick={() => navigate(unseen.length === 1 ? `/app/incidencias/${unseen[0].id}` : "/app/incidencias")}>
+              Ver
+            </Button>
+          }
+        />
+      )}
       <div className="stat-grid">
         <article className="stat-card tone-athletes">
           <span>Deportistas</span>
-          <strong>{athletes.length}</strong>
+          <strong>{myAthletes.length}</strong>
         </article>
         <article className="stat-card tone-scheduled">
           <span>Programados esta semana</span>
@@ -107,6 +132,9 @@ export function DashboardPage() {
             </Button>
             <Button block onClick={() => navigate("/app/seguimiento")}>
               Ver seguimiento
+            </Button>
+            <Button block onClick={() => navigate("/app/incidencias")}>
+              Ver incidencias
             </Button>
           </div>
           <p style={{ color: "#5C6570", marginTop: 18, marginBottom: 0 }}>

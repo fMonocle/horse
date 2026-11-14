@@ -1,36 +1,31 @@
-import {
-  CalendarOutlined,
-  DashboardOutlined,
-  FileTextOutlined,
-  LineChartOutlined,
-  LogoutOutlined,
-  MenuOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import { Avatar, Button, Drawer, Layout, Menu, Segmented } from "antd";
+import { BellOutlined, LogoutOutlined, MenuOutlined } from "@ant-design/icons";
+import { Avatar, Badge, Button, Drawer, Layout, Menu, Segmented, Select } from "antd";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { navItems, useAlertCount, usePanelAccess } from "../access";
+import { useAdmin } from "../admin-store";
 import { useAuth } from "../auth";
-import { athleteName, athletes, DEMO_ATHLETE_ID } from "../data/athletes";
+import { panelRole, PERSONA_USER } from "../data/platform";
+import { clearPersistedState } from "../persisted-state";
+import type { Panel } from "../types";
 
 const { Sider, Header, Content } = Layout;
 
 const NAV_QUERY = "(max-width: 991px)";
 const NARROW_QUERY = "(max-width: 720px)";
 
-const coachItems = [
-  { key: "/app", icon: <DashboardOutlined />, label: "Panel" },
-  { key: "/app/deportistas", icon: <TeamOutlined />, label: "Deportistas" },
-  { key: "/app/rutina", icon: <FileTextOutlined />, label: "Rutina" },
-  { key: "/app/planificacion", icon: <CalendarOutlined />, label: "Planificación" },
-  { key: "/app/seguimiento", icon: <LineChartOutlined />, label: "Seguimiento" },
+const panelOptions: Array<{ label: string; value: Panel }> = [
+  { label: "Owner", value: "owner" },
+  { label: "Entrenador", value: "coach" },
+  { label: "Deportista", value: "athlete" },
+  { label: "Médico", value: "doctor" },
 ];
 
-const athleteItems = [
-  { key: "/app/mi-semana", icon: <CalendarOutlined />, label: "Mi semana" },
-  { key: "/app/mi-evolucion", icon: <LineChartOutlined />, label: "Mi evolución" },
-];
+const alertTarget: Partial<Record<Panel, string>> = {
+  coach: "/app/incidencias",
+  doctor: "/app/incidencias",
+  athlete: "/app/mi-historial",
+};
 
 function useMedia(query: string) {
   const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
@@ -50,18 +45,32 @@ function useMedia(query: string) {
   return matches;
 }
 
+function initials(name: string): string {
+  return name
+    .replace(/^(Dra?\.|Lic\.)\s+/, "")
+    .split(" ")
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("");
+}
+
 export function AppShell() {
   const { panel, setPanel, signOut } = useAuth();
+  const { users, roles } = useAdmin();
+  const { items } = usePanelAccess();
+  const alerts = useAlertCount();
   const navigate = useNavigate();
   const location = useLocation();
   const compactNav = useMedia(NAV_QUERY);
   const narrow = useMedia(NARROW_QUERY);
   const [navOpen, setNavOpen] = useState(false);
-  const demoAthlete = athletes.find((athlete) => athlete.id === DEMO_ATHLETE_ID)!;
-  const items = panel === "coach" ? coachItems : athleteItems;
-  const selected = items.some((item) => item.key === location.pathname)
-    ? location.pathname
-    : items[0].key;
+  const persona = users.find((user) => user.id === PERSONA_USER[panel]);
+  const roleName = roles.find((role) => role.id === panelRole[panel])?.name ?? "";
+  const selected =
+    items
+      .filter((item) => location.pathname === item.key || location.pathname.startsWith(`${item.key}/`))
+      .sort((a, b) => b.key.length - a.key.length)[0]?.key ?? "";
+  const badgeKey = alertTarget[panel];
 
   useEffect(() => {
     setNavOpen(false);
@@ -71,11 +80,29 @@ export function AppShell() {
     if (!compactNav) setNavOpen(false);
   }, [compactNav]);
 
+  function switchPanel(next: Panel) {
+    const modules = new Set(roles.find((role) => role.id === panelRole[next])?.modules ?? []);
+    setPanel(next);
+    navigate(navItems.find((item) => modules.has(item.module))?.key ?? "/app");
+  }
+
   const menu = (
     <Menu
       mode="inline"
       selectedKeys={[selected]}
-      items={items}
+      items={items.map((item) => ({
+        key: item.key,
+        icon: item.icon,
+        label:
+          item.key === badgeKey && alerts > 0 ? (
+            <span className="menu-badge">
+              {item.label}
+              <Badge count={alerts} size="small" />
+            </span>
+          ) : (
+            item.label
+          ),
+      }))}
       style={{ borderInlineEnd: "none", background: "transparent" }}
       onClick={({ key }) => {
         setNavOpen(false);
@@ -105,38 +132,45 @@ export function AppShell() {
             />
           )}
           <div className="header-main">
-            <Segmented
-              block={narrow}
-              className="panel-switch"
-              value={panel}
-              options={[
-                { label: narrow ? "Entrenador" : "Panel de entrenador", value: "coach" },
-                { label: narrow ? "Deportista" : "Panel del deportista", value: "athlete" },
-              ]}
-              onChange={(value) => {
-                const next = value as "coach" | "athlete";
-                setPanel(next);
-                navigate(next === "coach" ? "/app" : "/app/mi-semana");
-              }}
-            />
+            {narrow ? (
+              <Select
+                className="panel-switch"
+                value={panel}
+                options={panelOptions.map((option) => ({ ...option, label: `Vista: ${option.label}` }))}
+                onChange={switchPanel}
+              />
+            ) : (
+              <Segmented
+                className="panel-switch"
+                value={panel}
+                options={panelOptions}
+                onChange={(value) => switchPanel(value as Panel)}
+              />
+            )}
           </div>
           <div className="header-actions">
+            {badgeKey && (
+              <Badge count={alerts} size="small" offset={[-4, 4]}>
+                <Button
+                  aria-label="Alertas"
+                  icon={<BellOutlined />}
+                  onClick={() => navigate(badgeKey)}
+                />
+              </Badge>
+            )}
             <span className="header-who">
-              {panel === "athlete" ? athleteName(demoAthlete) : "Owner"}
+              <b>{persona?.name}</b>
+              <small>{roleName}</small>
             </span>
-            <Avatar
-              style={{ background: "#12151C" }}
-              icon={panel === "athlete" ? <UserOutlined /> : undefined}
-            >
-              {panel === "coach" ? "OW" : demoAthlete.firstName.slice(0, 1)}
-            </Avatar>
+            <Avatar style={{ background: "#12151C" }}>{initials(persona?.name ?? "H")}</Avatar>
             <Button
               className="logout-button"
               aria-label="Salir"
               icon={<LogoutOutlined />}
               onClick={() => {
                 signOut();
-                navigate("/");
+                clearPersistedState();
+                window.location.assign(import.meta.env.BASE_URL);
               }}
             >
               <span className="logout-label">Salir</span>
