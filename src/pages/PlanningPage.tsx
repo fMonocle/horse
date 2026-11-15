@@ -1,8 +1,10 @@
 import { LeftOutlined, PlusOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
-import { useState } from "react";
-import { addDays, formatShort, startOfWeek, toIso, weekLabel, weekdayShort } from "../dates";
+import { useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useFollowup } from "../followup-store";
+import { addDays, formatShort, fromIso, startOfWeek, toIso, weekLabel, weekdayShort } from "../dates";
 import { useMyAthletes } from "../admin-store";
 import { athleteName, athletes } from "../data/athletes";
 import { sessionTypes } from "../data/seed";
@@ -22,7 +24,11 @@ export function PlanningPage() {
   const myAthletes = useMyAthletes();
   const mine = new Set(myAthletes.map((athlete) => athlete.id));
   const sessions = allSessions.filter((session) => mine.has(session.athleteId));
-  const [offset, setOffset] = useState(0);
+  const { routines } = useFollowup();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const initialOffset = useMemo(() => weekOffset(params.get("fecha")), [params]);
+  const [offset, setOffset] = useState(initialOffset);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Session | null>(null);
   const [form] = Form.useForm<FormValues>();
@@ -84,6 +90,25 @@ export function PlanningPage() {
                 </span>
                 <Button size="small" type="text" icon={<PlusOutlined />} onClick={() => openCreate(date)} />
               </header>
+              {routines
+                .filter((routine) => routine.date === date && mine.has(routine.athleteId))
+                .map((routine) => {
+                  const athlete = athletes.find((item) => item.id === routine.athleteId);
+                  return (
+                    <button
+                      key={routine.id}
+                      type="button"
+                      className={routine.status === "reported" ? "session-chip done" : "session-chip"}
+                      onClick={() => navigate(`/app/rutinas/${routine.id}`)}
+                    >
+                      <b>{athlete ? athleteName(athlete) : "Deportista"}</b>
+                      <span>
+                        {routine.title}
+                        {routine.sourceName ? " · planilla" : ""}
+                      </span>
+                    </button>
+                  );
+                })}
               {items.map((session) => {
                 const athlete = athletes.find((item) => item.id === session.athleteId);
                 return (
@@ -172,4 +197,11 @@ export function PlanningPage() {
       </Modal>
     </div>
   );
+}
+
+function weekOffset(fecha: string | null): number {
+  if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return 0;
+  const target = startOfWeek(fromIso(fecha)).getTime();
+  const current = startOfWeek(new Date()).getTime();
+  return Math.round((target - current) / (7 * 24 * 60 * 60 * 1000));
 }

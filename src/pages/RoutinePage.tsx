@@ -1,6 +1,7 @@
-import { SendOutlined } from "@ant-design/icons";
+import { ImportOutlined, SendOutlined } from "@ant-design/icons";
 import { Button, Select } from "antd";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AssignRoutineModal } from "../components/AssignRoutineModal";
 import { rutinaExercises, type RutinaSet } from "../data/rutina-excel";
 
@@ -21,6 +22,7 @@ export function RoutinePage() {
     [name],
   );
   const [assigning, setAssigning] = useState(false);
+  const navigate = useNavigate();
   const firstSession = exercise.sessions[0];
   const defaults = useMemo(
     () => [
@@ -51,6 +53,9 @@ export function RoutinePage() {
             }))}
             onChange={setName}
           />
+          <Button icon={<ImportOutlined />} onClick={() => navigate("/app/importar")}>
+            Importar Excel
+          </Button>
           <Button type="primary" icon={<SendOutlined />} onClick={() => setAssigning(true)}>
             Asignar rutina
           </Button>

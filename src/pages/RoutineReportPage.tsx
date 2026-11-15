@@ -1,11 +1,29 @@
 import { ArrowLeftOutlined, CheckCircleFilled, CloseCircleFilled } from "@ant-design/icons";
-import { App, Button, Card, Checkbox, Input, Rate, Select, Slider, Switch, Tag } from "antd";
-import { useMemo, useState } from "react";
+import { App, Button, Card, Checkbox, Input, Rate, Segmented, Select, Slider, Switch, Tag } from "antd";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { formatLong } from "../dates";
 import { athleteName, athletes, DEMO_ATHLETE_ID } from "../data/athletes";
 import { discomfortZones, feelingLabel } from "../data/followup";
 import { useFollowup } from "../followup-store";
+import type { RoutineExercise, SetLoad } from "../types";
+
+type RowState = {
+  completion: "done" | "partial" | "skipped";
+  result: string;
+  performedSets: SetLoad[];
+};
+
+function blocksOf(exercises: RoutineExercise[]) {
+  const groups: Array<{ block: string; exercises: RoutineExercise[] }> = [];
+  exercises.forEach((exercise) => {
+    const block = exercise.block ?? "sin número";
+    const current = groups[groups.length - 1];
+    if (current?.block === block) current.exercises.push(exercise);
+    else groups.push({ block, exercises: [exercise] });
+  });
+  return groups;
+}
 
 export function RoutineReportPage() {
   const { id } = useParams();
@@ -16,11 +34,22 @@ export function RoutineReportPage() {
   const report = reports.find((item) => item.assignmentId === id);
   const athlete = athletes.find((item) => item.id === DEMO_ATHLETE_ID)!;
 
-  const initial = useMemo(
-    () => Object.fromEntries((routine?.exercises ?? []).map((exercise) => [exercise.id, { done: true, result: "" }])),
+  const initial = useMemo<Record<string, RowState>>(
+    () =>
+      Object.fromEntries(
+        (routine?.exercises ?? []).map((exercise) => [
+          exercise.id,
+          {
+            completion: "done" as const,
+            result: "",
+            performedSets: (exercise.sets ?? []).map((set) => ({ ...set })),
+          },
+        ]),
+      ),
     [routine],
   );
-  const [results, setResults] = useState<Record<string, { done: boolean; result: string }>>(initial);
+  const [results, setResults] = useState<Record<string, RowState>>(initial);
+  useEffect(() => setResults(initial), [initial]);
   const [feeling, setFeeling] = useState(4);
   const [effort, setEffort] = useState(6);
   const [comment, setComment] = useState("");
@@ -29,6 +58,14 @@ export function RoutineReportPage() {
   const [intensity, setIntensity] = useState(4);
   const [description, setDescription] = useState("");
   const [share, setShare] = useState(true);
+
+  function updateSet(exerciseId: string, index: number, patch: Partial<SetLoad>) {
+    setResults((current) => {
+      const row = current[exerciseId];
+      const performedSets = row.performedSets.map((set, setIndex) => (setIndex === index ? { ...set, ...patch } : set));
+      return { ...current, [exerciseId]: { ...row, performedSets } };
+    });
+  }
 
   if (!routine) {
     return (
@@ -63,9 +100,10 @@ export function RoutineReportPage() {
           <ul className="result-list">
             {routine.exercises.map((exercise) => {
               const result = report.results.find((item) => item.exerciseId === exercise.id);
+              const complete = result?.completion ? result.completion === "done" : result?.done;
               return (
                 <li key={exercise.id}>
-                  {result?.done ? <CheckCircleFilled style={{ color: "#2f6b45" }} /> : <CloseCircleFilled style={{ color: "#c2410c" }} />}
+                  {complete ? <CheckCircleFilled style={{ color: "#2f6b45" }} /> : <CloseCircleFilled style={{ color: "#c2410c" }} />}
                   <div>
                     <b>{exercise.name}</b>
                     <span>
@@ -108,7 +146,16 @@ export function RoutineReportPage() {
     const incident = submitReport(
       currentRoutine.id,
       {
-        results: currentRoutine.exercises.map((exercise) => ({ exerciseId: exercise.id, ...results[exercise.id] })),
+        results: currentRoutine.exercises.map((exercise) => {
+          const row = results[exercise.id];
+          return {
+            exerciseId: exercise.id,
+            done: row.completion === "done",
+            result: row.result,
+            completion: row.completion,
+            performedSets: row.completion === "skipped" ? [] : row.performedSets,
+          };
+        }),
         feeling,
         effort,
         comment: comment.trim(),
@@ -126,30 +173,69 @@ export function RoutineReportPage() {
       {header}
       <Card title="¿Qué hiciste?">
         <div className="report-exercises">
-          {routine.exercises.map((exercise) => {
-            const value = results[exercise.id] ?? { done: true, result: "" };
-            return (
-              <div key={exercise.id} className={value.done ? "report-exercise" : "report-exercise missed"}>
-                <div className="report-exercise-head">
-                  <div>
-                    <b>{exercise.name}</b>
-                    <span>{exercise.prescription}</span>
+          {blocksOf(routine.exercises).map((group) => (
+            <section key={group.block}>
+              {group.block !== "sin número" && <h3 className="block-label">Bloque {group.block}</h3>}
+              {group.exercises.map((exercise) => {
+                const value = results[exercise.id] ?? { completion: "done" as const, result: "", performedSets: [] };
+                const missed = value.completion !== "done";
+                return (
+                  <div key={exercise.id} className={missed ? "report-exercise missed" : "report-exercise"}>
+                    <div className="report-exercise-head">
+                      <div>
+                        <b>{exercise.code ? `${exercise.code} · ${exercise.name}` : exercise.name}</b>
+                        <span>{exercise.note || exercise.prescription}</span>
+                      </div>
+                      {exercise.videoUrl && (
+                        <a href={exercise.videoUrl} target="_blank" rel="noreferrer">
+                          Video
+                        </a>
+                      )}
+                    </div>
+                    <Segmented
+                      block
+                      value={value.completion}
+                      onChange={(completion) =>
+                        setResults({ ...results, [exercise.id]: { ...value, completion: completion as RowState["completion"] } })
+                      }
+                      options={[
+                        { label: "Completo", value: "done" },
+                        { label: "Parcial", value: "partial" },
+                        { label: "No lo hice", value: "skipped" },
+                      ]}
+                    />
+                    {value.completion !== "skipped" && value.performedSets.length > 0 && (
+                      <div className="set-compare">
+                        {value.performedSets.map((set, index) => (
+                          <div className="set-log" key={index}>
+                            <b>Serie {index + 1}</b>
+                            <Input
+                              value={set.load}
+                              inputMode="decimal"
+                              aria-label={`Carga de la serie ${index + 1}`}
+                              onChange={(event) => updateSet(exercise.id, index, { load: event.target.value })}
+                            />
+                            <Input
+                              value={set.reps}
+                              aria-label={`Repeticiones de la serie ${index + 1}`}
+                              onChange={(event) => updateSet(exercise.id, index, { reps: event.target.value })}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {value.completion !== "done" && (
+                      <Input
+                        placeholder="¿Qué pasó?"
+                        value={value.result}
+                        onChange={(event) => setResults({ ...results, [exercise.id]: { ...value, result: event.target.value } })}
+                      />
+                    )}
                   </div>
-                  <Checkbox
-                    checked={value.done}
-                    onChange={(event) => setResults({ ...results, [exercise.id]: { ...value, done: event.target.checked } })}
-                  >
-                    Lo hice
-                  </Checkbox>
-                </div>
-                <Input
-                  placeholder={value.done ? "Resultado (opcional): series, carga, tiempo" : "¿Por qué no lo hiciste?"}
-                  value={value.result}
-                  onChange={(event) => setResults({ ...results, [exercise.id]: { ...value, result: event.target.value } })}
-                />
-              </div>
-            );
-          })}
+                );
+              })}
+            </section>
+          ))}
         </div>
       </Card>
 

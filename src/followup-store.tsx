@@ -9,12 +9,14 @@ import {
   initialReports,
   initialRoutineAssignments,
 } from "./data/followup";
+import { sampleImportHistory, sampleImportedRoutines } from "./data/imported-week";
 import type {
   Discomfort,
   ExerciseResult,
   HistoryEvent,
   Incident,
   RoutineAssignment,
+  RoutineExercise,
   RoutineReport,
 } from "./types";
 
@@ -24,7 +26,12 @@ export type RoutineDraft = {
   date: string;
   title: string;
   note: string;
-  exercises: Array<{ name: string; prescription: string }>;
+  weekday?: string;
+  institution?: string;
+  period?: string;
+  sourceName?: string;
+  planKey?: string;
+  exercises: Array<Omit<RoutineExercise, "id">>;
 };
 
 export type ReportDraft = {
@@ -64,10 +71,16 @@ export function sortHistory(events: HistoryEvent[]): HistoryEvent[] {
 }
 
 export function FollowupProvider({ children }: { children: ReactNode }) {
-  const [routines, setRoutines] = usePersistedState<RoutineAssignment[]>("routines", initialRoutineAssignments);
+  const [routines, setRoutines] = usePersistedState<RoutineAssignment[]>("routines2", [
+    ...sampleImportedRoutines,
+    ...initialRoutineAssignments,
+  ]);
   const [reports, setReports] = usePersistedState<RoutineReport[]>("reports", initialReports);
   const [incidents, setIncidents] = usePersistedState<Incident[]>("incidents", initialIncidents);
-  const [history, setHistory] = usePersistedState<HistoryEvent[]>("history", initialHistory);
+  const [history, setHistory] = usePersistedState<HistoryEvent[]>("history2", [
+    ...sampleImportHistory,
+    ...initialHistory,
+  ]);
 
   const value = useMemo<FollowupStore>(() => {
     const log = (row: Omit<HistoryEvent, "id" | "date">) =>
@@ -92,6 +105,11 @@ export function FollowupProvider({ children }: { children: ReactNode }) {
             date: draft.date,
             title: draft.title,
             note: draft.note,
+            weekday: draft.weekday,
+            institution: draft.institution,
+            period: draft.period,
+            sourceName: draft.sourceName,
+            planKey: draft.planKey,
             status: "assigned",
             exercises: draft.exercises.map((exercise, index) => ({ ...exercise, id: `${id}-e${index + 1}` })),
           },
@@ -115,9 +133,13 @@ export function FollowupProvider({ children }: { children: ReactNode }) {
         setRoutines((current) =>
           current.map((item) => (item.id === assignmentId ? { ...item, status: "reported" } : item)),
         );
-        const missing = assignment.exercises.filter(
-          (exercise) => !draft.results.find((result) => result.exerciseId === exercise.id)?.done,
-        );
+        const resultOf = (exerciseId: string) => draft.results.find((result) => result.exerciseId === exerciseId);
+        const skipped = assignment.exercises.filter((exercise) => {
+          const result = resultOf(exercise.id);
+          return result?.completion ? result.completion === "skipped" : !result?.done;
+        });
+        const partial = assignment.exercises.filter((exercise) => resultOf(exercise.id)?.completion === "partial");
+        const missing = [...partial, ...skipped];
         const done = assignment.exercises.length - missing.length;
         log({
           athleteId: assignment.athleteId,
@@ -128,7 +150,10 @@ export function FollowupProvider({ children }: { children: ReactNode }) {
         });
 
         let incident: Incident | null = null;
-        const missingText = missing.length > 0 ? ` No hizo: ${missing.map((item) => item.name).join(", ")}.` : "";
+        const missingText = [
+          partial.length > 0 ? ` Parciales: ${partial.map((item) => item.name).join(", ")}.` : "",
+          skipped.length > 0 ? ` Sin hacer: ${skipped.map((item) => item.name).join(", ")}.` : "",
+        ].join("");
         if (draft.discomfort) {
           const zone = draft.discomfort.zone.toLowerCase();
           incident = {
@@ -168,7 +193,7 @@ export function FollowupProvider({ children }: { children: ReactNode }) {
             athleteId: assignment.athleteId,
             kind: "incident",
             title: "Ejercicios no completados",
-            detail: `${missing.length} de ${assignment.exercises.length} sin hacer.`,
+            detail: `${missing.length} de ${assignment.exercises.length} sin completar.`,
             actor,
             incidentId: incident.id,
           });

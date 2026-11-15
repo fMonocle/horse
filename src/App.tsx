@@ -19,10 +19,12 @@ import { AthleteProgressPage, AthleteWeekPage } from "./pages/AthletePanelPages"
 import { AthletesPage } from "./pages/AthletesPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { DoctorDashboardPage } from "./pages/DoctorDashboardPage";
+import { ImportRoutinePage } from "./pages/ImportRoutinePage";
 import { IncidentDetailPage } from "./pages/IncidentDetailPage";
 import { IncidentsPage } from "./pages/IncidentsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { PlanningPage } from "./pages/PlanningPage";
+import { RoutineComparePage } from "./pages/RoutineComparePage";
 import { RoutinePage } from "./pages/RoutinePage";
 import { RoutineReportPage } from "./pages/RoutineReportPage";
 import { TrackingPage } from "./pages/TrackingPage";
@@ -52,6 +54,8 @@ export function App() {
                       <Route path="deportistas/:id" element={guard("athletes", <AthleteProfilePage />)} />
                       <Route path="planificacion" element={guard("planning", <PlanningPage />)} />
                       <Route path="rutina" element={guard("routine", <RoutinePage />)} />
+                      <Route path="importar" element={guard("routine", <ImportRoutinePage />)} />
+                      <Route path="rutinas/:id" element={guard("routine", <RoutineComparePage />)} />
                       <Route path="seguimiento" element={guard("tracking", <TrackingPage />)} />
                       <Route path="incidencias" element={guard("incidents", <IncidentsPage />)} />
                       <Route path="incidencias/:id" element={guard("incidents", <IncidentDetailPage />)} />

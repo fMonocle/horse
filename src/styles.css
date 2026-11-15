@@ -1111,6 +1111,88 @@ a {
   font-size: 13px;
 }
 
+.import-head,
+.import-exercise,
+.set-compare-row,
+.set-log {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.import-head span,
+.import-exercise > span,
+.set-compare-row span {
+  color: #5c6570;
+  font-size: 13px;
+}
+
+.import-head b,
+.import-exercise b,
+.import-head span,
+.import-exercise > span {
+  display: block;
+}
+
+.warning-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.block-list h3,
+.block-label {
+  margin: 14px 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5c6570;
+}
+
+.import-exercise {
+  flex-wrap: wrap;
+  padding: 10px 0;
+  border-top: 1px solid #eef0f4;
+}
+
+.import-exercise.ambiguous {
+  background: #fbf6ef;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.import-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.set-compare {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.set-compare-row,
+.set-log {
+  align-items: center;
+  background: #f7f8fb;
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.set-log .ant-input {
+  width: 96px;
+}
+
+.set-compare-row .diff {
+  color: #b03e1c;
+  font-weight: 700;
+}
+
 @media (max-width: 1100px) {
   .stat-grid,
   .two-col {
@@ -1412,5 +1494,16 @@ a {
 
   .steps-card .ant-steps {
     min-width: 520px;
+  }
+
+  .set-log,
+  .set-compare-row,
+  .import-confirm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .set-log .ant-input {
+    width: 100%;
   }
 }

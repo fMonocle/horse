@@ -114,6 +114,7 @@ export const initialUsers: User[] = [
   { id: "u-a6", name: "Andrés Quispe", email: "andres.quispe@horse.app", roleId: "athlete", status: "active", athleteId: "a6", createdAt: addMonths(todayIso(), -9) },
   { id: "u-a7", name: "Martina Gómez", email: "martina.gomez@horse.app", roleId: "athlete", status: "active", athleteId: "a7", createdAt: addMonths(todayIso(), -12) },
   { id: "u-a8", name: "Sofía Almeida", email: "sofia.almeida@horse.app", roleId: "athlete", status: "active", athleteId: "a8", createdAt: addMonths(todayIso(), -4) },
+  { id: "u-a9", name: "Pedro H.", email: "pedro.h@horse.app", roleId: "athlete", status: "active", athleteId: "a9", createdAt: addMonths(todayIso(), -3) },
   { id: "u-x1", name: "Julieta Paz", email: "julieta.paz@horse.app", roleId: "athlete", status: "suspended", createdAt: addMonths(todayIso(), -9) },
   { id: "u-x2", name: "Tomás Rivas", email: "tomas.rivas@horse.app", roleId: "athlete", status: "inactive", createdAt: addMonths(todayIso(), -11) },
 ];
@@ -127,6 +128,7 @@ export const initialAssignments: Assignment[] = [
   { athleteId: "a6", coachId: "u-coach-1", professionalIds: ["u-doc-2"] },
   { athleteId: "a7", coachId: "u-coach-1", professionalIds: ["u-doc-1"] },
   { athleteId: "a8", coachId: "u-coach-2", professionalIds: ["u-doc-2"] },
+  { athleteId: "a9", coachId: "u-coach-1", professionalIds: ["u-doc-1"] },
 ];
 
 export const initialPlans: Plan[] = [
@@ -213,6 +215,7 @@ export const initialSubscriptions: Subscription[] = [
   { id: "sub-a6", userId: "u-a6", planId: "plata", status: "current", startDate: addMonths(todayIso(), -9), nextDue: daysFromToday(15), autoRenew: true },
   { id: "sub-a7", userId: "u-a7", planId: "oro", status: "current", startDate: addMonths(todayIso(), -12), nextDue: daysFromToday(25), autoRenew: true },
   { id: "sub-a8", userId: "u-a8", planId: "bronce", status: "pending", startDate: addMonths(todayIso(), -4), nextDue: daysFromToday(-1), autoRenew: false },
+  { id: "sub-a9", userId: "u-a9", planId: "plata", status: "current", startDate: addMonths(todayIso(), -3), nextDue: daysFromToday(18), autoRenew: true },
   { id: "sub-x1", userId: "u-x1", planId: "plata", status: "suspended", startDate: addMonths(todayIso(), -9), nextDue: daysFromToday(-24), autoRenew: false },
   { id: "sub-x2", userId: "u-x2", planId: "bronce", status: "cancelled", startDate: addMonths(todayIso(), -11), nextDue: null, autoRenew: false, cancelledAt: daysFromToday(-40) },
 ];

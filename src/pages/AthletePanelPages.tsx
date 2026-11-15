@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { addDays, formatShort, startOfWeek, toIso } from "../dates";
+import { addDays, formatShort, startOfWeek, todayIso, toIso } from "../dates";
 import { athletes, DEMO_ATHLETE_ID } from "../data/athletes";
 import { measurements } from "../data/seed";
 import { useTraining } from "../store";
@@ -38,8 +38,12 @@ export function AthleteWeekPage() {
   const restriction = incidents.find(
     (incident) => incident.status !== "closed" && incident.evaluation && incident.evaluation.fitness !== "fit",
   );
-  const myRoutines = routines
-    .filter((routine) => routine.athleteId === athlete.id)
+  const today = todayIso();
+  const mine = routines.filter((routine) => routine.athleteId === athlete.id);
+  const imported = mine.filter((routine) => routine.planKey).sort((a, b) => a.date.localeCompare(b.date));
+  const todayRoutine = mine.find((routine) => routine.date === today);
+  const myRoutines = mine
+    .filter((routine) => !routine.planKey)
     .sort((a, b) => (a.status === b.status ? a.date.localeCompare(b.date) : a.status === "assigned" ? -1 : 1))
     .slice(0, 4);
 
@@ -78,6 +82,39 @@ export function AthleteWeekPage() {
           description={restriction.evaluation.recommendation}
         />
       )}
+      <Card title={todayRoutine ? "Entrenamiento de hoy" : "Entrenamiento importado"} style={{ marginBottom: 14 }}>
+        {todayRoutine ? (
+          <div className="routine-row">
+            <div>
+              <b>{todayRoutine.title}</b>
+              <span>{todayRoutine.exercises.length} ejercicios</span>
+            </div>
+            <Button type="primary" onClick={() => navigate(`/app/mi-rutina/${todayRoutine.id}`)}>
+              {todayRoutine.status === "assigned" ? "Empezar" : "Ver"}
+            </Button>
+          </div>
+        ) : (
+          <p className="plan-summary">Hoy no hay un entrenamiento cargado.</p>
+        )}
+        {imported.length > 0 && (
+          <div className="mini-list" style={{ marginTop: 12 }}>
+            {imported.map((routine) => (
+              <div key={routine.id} className="routine-row">
+                <div>
+                  <b>{routine.weekday ?? routine.title}</b>
+                  <span>
+                    {formatShort(routine.date)} · {routine.exercises.length} ejercicios
+                    {routine.sourceName ? ` · ${routine.sourceName}` : ""}
+                  </span>
+                </div>
+                <Button type={routine.id === todayRoutine?.id ? "default" : "primary"} onClick={() => navigate(`/app/mi-rutina/${routine.id}`)}>
+                  {routine.status === "assigned" ? "Informar" : "Ver"}
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
       <Card title="Rutinas para informar" style={{ marginBottom: 14 }}>
         {myRoutines.length === 0 ? (
           <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No tenés rutinas asignadas." />

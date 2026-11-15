@@ -117,12 +117,18 @@ export function AthleteProfilePage() {
                   <div>
                     <b>{routine.title}</b>
                     <span>
-                      {formatShort(routine.date)} · {routine.exercises.map((exercise) => exercise.name).join(", ")}
+                      {formatShort(routine.date)} · {routine.exercises.length} ejercicios
+                      {routine.sourceName ? ` · ${routine.sourceName}` : ""}
                     </span>
                   </div>
-                  <Tag color={routine.status === "reported" ? "green" : "blue"}>
-                    {routine.status === "reported" ? "Informada" : "Asignada"}
-                  </Tag>
+                  <div className="row-actions">
+                    <Tag color={routine.status === "reported" ? "green" : "blue"}>
+                      {routine.status === "reported" ? "Informada" : "Asignada"}
+                    </Tag>
+                    <Button size="small" onClick={() => navigate(`/app/rutinas/${routine.id}`)}>
+                      Comparar
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

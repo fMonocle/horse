@@ -124,10 +124,17 @@ export type Movement = {
   subscriptionId?: string;
 };
 
+export type SetLoad = { load: string; reps: string };
+
 export type RoutineExercise = {
   id: string;
   name: string;
   prescription: string;
+  code?: string;
+  block?: string;
+  sets?: SetLoad[];
+  note?: string;
+  videoUrl?: string;
 };
 
 export type RoutineAssignment = {
@@ -139,12 +146,19 @@ export type RoutineAssignment = {
   note: string;
   exercises: RoutineExercise[];
   status: "assigned" | "reported";
+  weekday?: string;
+  institution?: string;
+  period?: string;
+  sourceName?: string;
+  planKey?: string;
 };
 
 export type ExerciseResult = {
   exerciseId: string;
   done: boolean;
   result: string;
+  completion?: "done" | "partial" | "skipped";
+  performedSets?: SetLoad[];
 };
 
 export type Discomfort = {

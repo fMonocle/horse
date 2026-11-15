@@ -57,11 +57,11 @@ function slug(text: string): string {
 }
 
 export function AdminProvider({ children }: { children: ReactNode }) {
-  const [users, setUsers] = usePersistedState<User[]>("users", initialUsers);
+  const [users, setUsers] = usePersistedState<User[]>("users2", initialUsers);
   const [roles, setRoles] = usePersistedState<Role[]>("roles", initialRoles);
-  const [assignments, setAssignments] = usePersistedState<Assignment[]>("assignments", initialAssignments);
+  const [assignments, setAssignments] = usePersistedState<Assignment[]>("assignments2", initialAssignments);
   const [plans, setPlans] = usePersistedState<Plan[]>("plans", initialPlans);
-  const [subscriptions, setSubscriptions] = usePersistedState<Subscription[]>("subscriptions", initialSubscriptions);
+  const [subscriptions, setSubscriptions] = usePersistedState<Subscription[]>("subscriptions2", initialSubscriptions);
   const [movements, setMovements] = usePersistedState<Movement[]>("movements", initialMovements);
 
   const value = useMemo<AdminStore>(() => {
