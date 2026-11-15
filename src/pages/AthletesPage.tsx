@@ -2,7 +2,8 @@ import { Avatar, Button, Input, Select, Table, Tag } from "antd";
 import { useMemo, useState, type TdHTMLAttributes } from "react";
 import { useNavigate } from "react-router-dom";
 import { addDays, formatShort, startOfWeek, toIso } from "../dates";
-import { athleteName, athletes, statusLabel } from "../data/athletes";
+import { useMyAthletes } from "../admin-store";
+import { athleteName, statusLabel } from "../data/athletes";
 import { useTraining } from "../store";
 import type { AthleteStatus } from "../types";
 
@@ -19,6 +20,7 @@ const statusColor: Record<AthleteStatus, string> = {
 export function AthletesPage() {
   const navigate = useNavigate();
   const { sessions } = useTraining();
+  const athletes = useMyAthletes();
   const [query, setQuery] = useState("");
   const [sport, setSport] = useState<string>();
   const [status, setStatus] = useState<AthleteStatus>();
@@ -36,7 +38,7 @@ export function AthletesPage() {
       const matchesStatus = !status || athlete.status === status;
       return matchesText && matchesSport && matchesStatus;
     });
-  }, [query, sport, status]);
+  }, [athletes, query, sport, status]);
 
   return (
     <div className="page">

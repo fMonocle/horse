@@ -1,6 +1,10 @@
-import { ArrowLeftOutlined } from "@ant-design/icons";
-import { Button, Card, Descriptions, Table, Tag } from "antd";
-import { Link, useParams } from "react-router-dom";
+import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Card, Descriptions, Empty, Table, Tag } from "antd";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { AssignRoutineModal } from "../components/AssignRoutineModal";
+import { HistoryTimeline } from "../components/HistoryTimeline";
+import { sortHistory, useFollowup } from "../followup-store";
 import {
   CartesianGrid,
   Line,
@@ -19,6 +23,9 @@ export function AthleteProfilePage() {
   const { id } = useParams();
   const athlete = athletes.find((item) => item.id === id);
   const { sessions } = useTraining();
+  const { routines, history: timeline } = useFollowup();
+  const navigate = useNavigate();
+  const [assigning, setAssigning] = useState(false);
 
   if (!athlete) {
     return (
@@ -38,6 +45,10 @@ export function AthleteProfilePage() {
   const chart = measurements
     .filter((item) => item.athleteId === athlete.id)
     .map((item) => ({ date: formatShort(item.date), value: item.value }));
+  const athleteRoutines = routines
+    .filter((routine) => routine.athleteId === athlete.id)
+    .sort((a, b) => b.date.localeCompare(a.date));
+  const events = sortHistory(timeline.filter((event) => event.athleteId === athlete.id));
 
   return (
     <div className="page">
@@ -51,7 +62,12 @@ export function AthleteProfilePage() {
             {athlete.sport} · {athlete.country}
           </p>
         </div>
-        <Tag color="blue">{statusLabel[athlete.status]}</Tag>
+        <div className="title-actions">
+          <Tag color="blue">{statusLabel[athlete.status]}</Tag>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setAssigning(true)}>
+            Asignar rutina
+          </Button>
+        </div>
       </div>
       <div className="two-col">
         <Card title="Información">
@@ -90,6 +106,38 @@ export function AthleteProfilePage() {
           </ResponsiveContainer>
         </div>
       </Card>
+      <div className="two-col" style={{ marginTop: 14 }}>
+        <Card title="Rutinas asignadas">
+          {athleteRoutines.length === 0 ? (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Todavía no tiene rutinas asignadas." />
+          ) : (
+            <div className="mini-list">
+              {athleteRoutines.map((routine) => (
+                <div key={routine.id} className="routine-row">
+                  <div>
+                    <b>{routine.title}</b>
+                    <span>
+                      {formatShort(routine.date)} · {routine.exercises.length} ejercicios
+                      {routine.sourceName ? ` · ${routine.sourceName}` : ""}
+                    </span>
+                  </div>
+                  <div className="row-actions">
+                    <Tag color={routine.status === "reported" ? "green" : "blue"}>
+                      {routine.status === "reported" ? "Informada" : "Asignada"}
+                    </Tag>
+                    <Button size="small" onClick={() => navigate(`/app/rutinas/${routine.id}`)}>
+                      Comparar
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+        <Card title="Historial" extra={<Button type="link" onClick={() => navigate("/app/incidencias")}>Incidencias</Button>}>
+          <HistoryTimeline events={events.slice(0, 8)} linkIncidents />
+        </Card>
+      </div>
       <Card title="Últimas mediciones" style={{ marginTop: 14 }}>
         <Table
           rowKey="date"
@@ -102,6 +150,7 @@ export function AthleteProfilePage() {
           ]}
         />
       </Card>
+      <AssignRoutineModal open={assigning} onClose={() => setAssigning(false)} defaultAthleteId={athlete.id} />
     </div>
   );
 }

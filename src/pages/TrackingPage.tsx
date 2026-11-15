@@ -1,5 +1,6 @@
-import { Card, Select, Table } from "antd";
+import { Button, Card, Empty, Select, Table, Tag } from "antd";
 import { useMemo, useState, type TdHTMLAttributes } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   CartesianGrid,
   Line,
@@ -10,8 +11,10 @@ import {
   YAxis,
 } from "recharts";
 import { addDays, formatShort, startOfWeek, toIso } from "../dates";
-import { athleteName, athletes } from "../data/athletes";
+import { useMyAthletes } from "../admin-store";
+import { athleteName, athletes as allAthletes } from "../data/athletes";
 import { measurements } from "../data/seed";
+import { useFollowup } from "../followup-store";
 import { useTraining } from "../store";
 
 function cellLabel(label: string): TdHTMLAttributes<HTMLTableCellElement> {
@@ -20,6 +23,10 @@ function cellLabel(label: string): TdHTMLAttributes<HTMLTableCellElement> {
 
 export function TrackingPage() {
   const { sessions } = useTraining();
+  const { routines, reports } = useFollowup();
+  const navigate = useNavigate();
+  const myAthletes = useMyAthletes();
+  const athletes = myAthletes.length > 0 ? myAthletes : allAthletes;
   const [athleteId, setAthleteId] = useState(athletes[0].id);
   const [weeks, setWeeks] = useState(8);
   const athlete = athletes.find((item) => item.id === athleteId) ?? athletes[0];
@@ -35,6 +42,9 @@ export function TrackingPage() {
 
   const history = sessions
     .filter((session) => session.athleteId === athlete.id && session.date >= from)
+    .sort((a, b) => b.date.localeCompare(a.date));
+  const digital = routines
+    .filter((routine) => routine.athleteId === athlete.id)
     .sort((a, b) => b.date.localeCompare(a.date));
   const done = history.filter((session) => session.completed).length;
   const percent = history.length === 0 ? 0 : Math.round((done / history.length) * 100);
@@ -116,6 +126,37 @@ export function TrackingPage() {
           <p style={{ color: "#5C6570" }}>{athlete.goal}</p>
         </Card>
       </div>
+      <Card title="Rutinas digitales" style={{ marginTop: 14 }}>
+        {digital.length === 0 ? (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Todavía no tiene una rutina digital." />
+        ) : (
+          <div className="mini-list">
+            {digital.map((routine) => {
+              const report = reports.find((item) => item.assignmentId === routine.id);
+              return (
+                <div key={routine.id} className="routine-row">
+                  <div>
+                    <b>{routine.title}</b>
+                    <span>
+                      {formatShort(routine.date)} · {routine.exercises.length} ejercicios
+                      {routine.sourceName ? ` · ${routine.sourceName}` : ""}
+                      {report ? ` · esfuerzo ${report.effort} de 10` : ""}
+                    </span>
+                  </div>
+                  <div className="row-actions">
+                    <Tag color={routine.status === "reported" ? "green" : "blue"}>
+                      {routine.status === "reported" ? "Informada" : "Asignada"}
+                    </Tag>
+                    <Button size="small" onClick={() => navigate(`/app/rutinas/${routine.id}`)}>
+                      Comparar
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

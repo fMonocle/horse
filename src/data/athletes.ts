@@ -107,6 +107,18 @@ export const athletes: Athlete[] = [
     metric: "Horas en el agua",
     unit: "h",
   },
+  {
+    id: "a9",
+    firstName: "Pedro",
+    lastName: "H.",
+    country: "Argentina",
+    sport: "Rugby",
+    status: "available",
+    goal: "Campeonato.",
+    coachNote: "La rutina sale de la planilla del Mar del Plata Rugby Club.",
+    metric: "Días de fuerza",
+    unit: "días",
+  },
 ];
 
 export function athleteName(athlete: Pick<Athlete, "firstName" | "lastName">): string {

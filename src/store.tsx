@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { usePersistedState } from "./persisted-state";
 import { initialSessions } from "./data/seed";
 import type { Session, SessionDraft } from "./types";
 
@@ -11,7 +12,7 @@ type TrainingStore = {
 const TrainingContext = createContext<TrainingStore | null>(null);
 
 export function TrainingProvider({ children }: { children: ReactNode }) {
-  const [sessions, setSessions] = useState<Session[]>(initialSessions);
+  const [sessions, setSessions] = usePersistedState<Session[]>("sessions", initialSessions);
 
   const value = useMemo<TrainingStore>(
     () => ({
